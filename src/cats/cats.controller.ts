@@ -7,33 +7,23 @@ import {
   Body,
   Query,
   Param,
-  HttpException,
-  HttpStatus,
 } from '@nestjs/common';
-
+import { CatsService } from './cats.service';
 import { CreateCatDto, ListAllEntities, UpdateCatDto } from './dto';
+import { Cat } from './interfaces/cat.interface';
+
 @Controller('cats')
 export class CatsController {
+  constructor(private CatsService: CatsService) {}
+
   @Get()
-  async getAll(@Query() query: ListAllEntities): Promise<string> {
-    try {
-      return `This action returns all cats (limit: ${query.limit} items)`;
-    } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.FORBIDDEN,
-          error: 'This is a custom message',
-        },
-        HttpStatus.FORBIDDEN,
-        {
-          cause: error,
-        },
-      );
-    }
+  async getAll(@Query() query: ListAllEntities): Promise<Cat[]> {
+    return this.CatsService.findAll();
   }
+
   @Post()
-  async create(@Body() createCatDto: CreateCatDto): Promise<CreateCatDto> {
-    return createCatDto;
+  async create(@Body() createCatDto: CreateCatDto) {
+    this.CatsService.create(createCatDto);
   }
 
   @Put(':id')
